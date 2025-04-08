@@ -1,9 +1,8 @@
 /* Questions, Comments, Concerns
 To Do:
--Pickup for next time:Start: Line 318, write schedule down on its own custom text file. create functions to create/display schedule
+-Pickup for next time:Start: remove medicine function
 -fix the casing order (low priority)
--link reminder to schedule(days of the week?)
--reorganize inputdata function into 3 distinct input functions(if time allows)
+-reorganize inputdata function into 3 distinct input functions(in progress)
 */
 #include <stdio.h>
 #include <stdlib.h>
@@ -20,6 +19,9 @@ void displayPharmacy();
 void samedayReminders();
 void stateToday(int day);
 void stateMonth(int month);
+void addMedicine();
+void removeMedicine();
+
 
 enum Week{
     Sunday,
@@ -69,7 +71,7 @@ typedef struct Pharmacy{
 void main()
 {
     int decision;
-    char choice;
+    char choice, mod, mod2;
 
     time_t now = time(NULL);
     struct tm *local = localtime(&now); //for time functions
@@ -99,7 +101,7 @@ void main()
         inputData();
         break;
     case 2:
-        printf("Displaying Reminders...\n");
+        printf("Displaying Reminders...\n"); //finished and works, just need to trim the fat
         samedayReminders();
         break;
     case 3:
@@ -119,9 +121,29 @@ void main()
     case 7:
         printf("Current Medications:\n");
         displayMeds();
+        printf("\nWould you like to modify this list?(y/n)\n");
+        scanf(" %c", &mod);
+        if(mod =='y'){
+            printf("would you like to 1.Add a medication 2. Remove a medication 3.Cancel\n");
+            scanf(" %d", &mod2);
+                switch(mod2){
+        case 1:
+            addMedicine();
+            break;
+        case 2:
+            removeMedicine();
+            break;
+        case 3:
+            printf("\nReturning...");
+            break;
+        default:
+            printf("\nUnknown Answer");
+            break;
+            }
+        }
         break;
     case 8:
-        printf("\nVer. 1.01\nTimely Prescription Reminders TM: a time based prescription reminder system.\n\nMade by Joseph Ramsay, Saish Gondkar, Krishna Valkambe, and Soham Panchal\n\n");
+        printf("\nVer. 1.02\nTimely Prescription Reminders TM: a time based prescription reminder system.\n\nMade by Joseph Ramsay, Saish Gondkar, Krishna Valkambe, and Soham Panchal\n\n");
         break;
     case 9:
         printf("Displaying Current Profile...\n"); //swap case 8/9 at some point
@@ -139,29 +161,103 @@ void main()
 
 } //closes main
 
+void addMedicine(){
+    FILE *fptr;
+    fptr = fopen("medication.txt","a");
+    Medication *mptr, temp;
+    mptr = &temp;
+    char choice;
+    printf("\nAdding a new medication...");
+    printf("\nIt is recommended to be filling out the form with your primary emergency contact at your side");
+    printf("\nPlease input medication name:");
+    scanf("%s", temp.name);
+    printf("Please input dosage amount followed by the unit (ex: 10 ml, 1 tablet)");
+    scanf("%d %s", &temp.dosage_amount, temp.dosage_unit);
+    fprintf(fptr, "\n%s  %d / %s ", temp.name, temp.dosage_amount, temp.dosage_unit);
+
+    for(int i = 0; i<7; i++){
+        mptr->schedule[i] = 1; //make schedule {1,1,1,1,1,1,1}
+    }
+    printf("\nHow often is this medication prescribed?\n1.Everyday\n2.Every other day\n3.Every 3 days\n4.Weekdays\n5.Weekends\n6.Custom...\n");
+    scanf(" %d",&choice);
+    switch (choice){
+    case 1:
+        printf("\nSchedule for this medication is compiled");
+        break;
+    case 2:
+        for(int i = 1; i<7; i++){
+        if(mptr->schedule[i-1] == 1)mptr->schedule[i] = 0; //make schedule {1,0,1,0,1,0,1}
+        }
+        break;
+    case 3:
+        mptr->schedule[1] = 0;
+        mptr->schedule[2] = 0;
+        mptr->schedule[4] = 0;
+        mptr->schedule[5] = 0; //NOT DONE(kinda, patch job.redo when 14 day schedule gets implemented): make schedule {1,0,0,1,0,0,1}
+        break;
+    case 4:
+        mptr->schedule[0] = 1;
+        mptr->schedule[6] = 1; //NOT DONE(kinda, patch job.redo when 14 day schedule gets implemented): make schedule {0,1,1,1,1,1,0}
+        break;
+    case 5:
+        for(int i = 1; i<6; i++){
+        mptr->schedule[i] = 0; //NOT DONE(same as above): make schedule {1,0,0,0,0,0,1}
+        }
+        break;
+    case 6:
+        for(int i = 0; i<7; i++){
+        mptr->schedule[i] = 1; //NOT DONE: make schedule custom
+        }
+        break;
+    }
+
+    printf("\nSchedule is: ");
+    fprintf(fptr, " Schedule is: ");
+    for(int j = 0; j<7; j++){
+        fprintf(fptr, " %d ", mptr->schedule[j]);
+        printf("%d, ",mptr->schedule[j]);
+    }
+    fclose(fptr);
+
+    fptr = fopen("schedule.txt","a");
+    for(int k = 0; k<7; k++){
+        fprintf(fptr, "%d", mptr->schedule[k]);
+        printf(" Marker: schedule created ");
+    }
+    fclose(fptr);
+}
+
+void removeMedicine(){
+
+
+    //first thing to do in next update
+
+
+}
+
 void stateToday(int day){
 
     switch (day){
     case 0:
-        printf("Today is Sunday");
+        printf("Sunday");
         break;
     case 1:
-        printf("Today is Monday");
+        printf("Monday");
         break;
     case 2:
-        printf("Today is Tuesday");
+        printf("Tuesday");
         break;
     case 3:
-        printf("Today is Wednesday");
+        printf("Wednesday");
         break;
     case 4:
-        printf("Today is Thursday");
+        printf("Thursday");
         break;
     case 5:
-        printf("Today is Friday");
+        printf("Friday");
         break;
     case 6:
-        printf("Today is Saturday");
+        printf("Saturday");
         break;
     }
 }
@@ -208,23 +304,6 @@ void stateMonth(int month){
     }
 }
 
-void firstTime(){
-    printf("\nFirst time setup placeholder text");
-    FILE* fptr;
-    fptr = fopen("patientInfo.txt","w");
-    if (fptr == NULL) {
-        printf("\n\nThe file is not opened. The program will exit now");
-        exit(0);
-    }
-    else {
-        printf("\n\nThe file is created Successfully.\n");
-        inputData();
-    }
-    printf("\nYou are now ready to use the app, your profile has been set up.\nTo access more features, add more medicine, or contact us, please use the main menu.");
-    fclose(fptr);
-    return;
-}
-
 void inputData(){
     Patient temp;
     Emergency primary;
@@ -243,7 +322,7 @@ void inputData(){
     printf("Enter last name: ");
     scanf("%s", temp.lastName);
     fprintf(fptr, "Patient Name: %s %s %s", temp.firstName,temp.middleName,temp.lastName);
-
+    //Make sure to update to store in the memory so it is always on hand.
 
     //Section 2: Establish patient DOB
     printf("Enter Patient DOB (MM/DD/YYYY): ");
@@ -274,12 +353,13 @@ void inputData(){
     scanf("%s", first.name);
     printf("Please input dosage amount followed by the unit (ex: 10 ml, 1 tablet)");
     scanf("%d %s", &first.dosage_amount, first.dosage_unit);
-    fprintf(fptr, "Medications:\n1.%s %d %s", first.name, first.dosage_amount, first.dosage_unit);
+    fprintf(fptr, "Medications | Dosage Amount | Schedule\n%s  %d / %s ", first.name, first.dosage_amount, first.dosage_unit);
 
     for(int i = 0; i<7; i++){
         mptr->schedule[i] = 1; //make schedule {1,1,1,1,1,1,1}
     }
 
+    //section 5: make schedule
     printf("\nHow often is this medication prescribed?\n1.Everyday\n2.Every other day\n3.Every 3 days\n4.Weekdays\n5.Weekends\n6.Custom...\n");
     scanf(" %d",&choice);
     switch (choice){
@@ -312,12 +392,23 @@ void inputData(){
         }
         break;
     }
+
+    //section 5.5: document schedule
     printf("\nSchedule is: ");
+    fprintf(fptr, " Schedule is: ");
     for(int j = 0; j<7; j++){
+        fprintf(fptr, " %d ", mptr->schedule[j]);
         printf("%d, ",mptr->schedule[j]);
     }
-
     fclose(fptr);
+    //create new schedule.txt, and assign a schedule to a medicine based on order of medications
+    fptr = fopen("schedule.txt","w");
+    for(int k = 0; k<7; k++){
+        fprintf(fptr, "%d", mptr->schedule[k]);
+        printf(" Marker: schedule created ");
+    }
+    fclose(fptr);
+
 }
 
 void displayPatient(){
@@ -350,6 +441,23 @@ void displayContacts(){
     fclose(fptr);
 }
 
+void inputPharmacy(){
+
+    Pharmacy temp;
+    FILE *fptr;
+    char doctor[20];
+
+    fptr = fopen("pharmacyInfo.txt","w"); //add option to input address?
+    printf("Enter pharmacy name: ");
+    scanf("%s", temp.storeName);
+
+    printf("Enter primary physician's name: ");
+    scanf("%s", doctor);
+    fprintf(fptr, "Pharmacy: %s \nPrimary Physcian:%s", temp.storeName,doctor);
+
+    fclose(fptr);
+}
+
 void displayPharmacy(){
     char choice;
     FILE* fptr;
@@ -370,39 +478,79 @@ void displayPharmacy(){
     }
 }
 
-void inputPharmacy(){
-
-    Pharmacy temp;
-    FILE *fptr;
-    char doctor[20];
-
-    fptr = fopen("pharmacyInfo.txt","w"); //add option to input address?
-    printf("Enter pharmacy name: ");
-    scanf("%s", temp.storeName);
-
-    printf("Enter primary physician's name: ");
-    scanf("%s", doctor);
-    fprintf(fptr, "Pharmacy: %s \nPrimary Physcian:%s", temp.storeName,doctor);
-
-    fclose(fptr);
-}
-
 void samedayReminders(){
+    int counter = 0, check = 0;//count how many medications to take today.
     time_t now = time(NULL);
     struct tm *local = localtime(&now);
+    FILE* fptr;
+    char str[100];
+    int med[10];
 
+    printf("Today is "); //im sure I can clean this up into one print statement at some point
     stateToday(local->tm_wday);
     printf(", ");
     stateMonth(local->tm_mon);
     printf(" %d", local->tm_mday);
-    printf(",%d.", local->tm_year + 1900); //Years since 1900
+    printf(",%d.", local->tm_year + 1900);
 
-    //perform check
+    fptr = fopen("schedule.txt","r");
+    if (fptr == NULL){
+        printf("\nSchedule failed to load line 419");
+        exit(0);
+    }
+    else printf("\nSchedule Loaded...\n");
 
-    printf("\nThere are # medications scheduled for today.\n"); //replace number sign with actual int, create loop below
+
+    printf("\nThe medications to take are:");
+
+    while(fgets(str, 10, fptr)!= NULL){
+        counter++;
+        if(str[local->tm_wday]== '1'){
+            med[counter] = 1;
+            printf("\nMed#%d",counter);
+            check++;
+        }else med[counter] = 0;
+    }
+    fclose(fptr); //closes the schedule, since binary operation is complete
+
+    printf("\nflag marker: getting medicine values for reminder");
+
+    fptr = fopen("medication.txt","r"); //opens the medications document, to log what is needed to be taken
+    if (fptr == NULL){
+        printf("\nPrescription list failed to load line 446");
+        exit(0);
+    }
+    else printf("\nPrescriptions Loaded...\n\n");
+
+    int j = 0;
+
+    while(fgets(str, 100, fptr)){ //checks value of medicine array, and if its 1/true value, prints the line from the document.
+        if(med[j] == 1){
+                printf("%s", str);
+        }
+        j++;
+    }
+    fclose(fptr);
+
+    printf("\nThere are %d medications scheduled for today.\n", check);
 
 }
 
-
+void firstTime(){
+    printf("\nFirst time setup placeholder text");
+    FILE* fptr;
+    fptr = fopen("patientInfo.txt","w");
+    if (fptr == NULL) {
+        printf("\n\nThe file is not opened. The program will exit now");
+        exit(0);
+    }
+    else {
+        printf("\n\nThe file is created Successfully.\n");
+        inputData();
+    }
+    printf("\nYou are now ready to use the app, your profile has been set up.\nTo access more features, add more medicine, or contact us, please use the main menu.");
+    fclose(fptr);
+    return;
+}
 
 
