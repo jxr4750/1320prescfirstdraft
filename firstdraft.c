@@ -1,15 +1,18 @@
 /* Questions, Comments, Concerns
 To Do:
--Pickup for next time:Start: remove medicine function
+-Pickup for next time: adjust sameday reminders(finicky if you add/remove a medication)
 -fix the casing order (low priority)
 -reorganize inputdata function into 3 distinct input functions(in progress)
+Patch Notes: took off the notes/reminder functions, as coding them in is beyond
+the necessity of the app for the moment and current functions planned are already
+integrated into the schedule and pharmacy tab
 */
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 #include <string.h>
 
-#define ver 1.03
+#define ver 1.04
 
 //List of functions used
 void firstTime(); //Used for the first time setup
@@ -79,10 +82,10 @@ void main()
     }
     else printf("Data Loaded...\n");
 
-    while(decision!= 10)
+    while(decision!= 8)
     {
-        printf("\nMain Menu:\n\nWhat would you like to do?\n1.Input Data(First time reset)\n2.Display Reminders\n3.Refill Reminders\n4.Notes\n5.Display Pharmacy Info");
-        printf("\n6.Display Emergency Contacts\n7.List all Current Medications\n8.Contact us(credits)\n9.Display Profile\n10.Exit\n\n");
+        printf("\nMain Menu:\n\nWhat would you like to do?\n1.Input Data(First time reset)\n2.Display Reminders\n3.Display Pharmacy Info");
+        printf("\n4.Display Emergency Contacts\n5.List all Current Medications\n6.Contact us(credits)\n7.Display Profile\n8.Exit\n\n");
         scanf("%d",&decision);
 
         switch(decision){
@@ -95,20 +98,14 @@ void main()
         samedayReminders();
         break;
     case 3:
-        printf("Refill Reminders..."); //extra QOL
-        break;
-    case 4:
-        printf("Reminder Notes..."); //extra QOL
-        break;
-    case 5:
         printf("Displaying Pharmacy info...");
         displayPharmacy();
         break;
-    case 6:
+    case 4:
         printf("Displaying Emergency Contacts...\n");
         displayContacts();
         break;
-    case 7:
+    case 5:
         printf("Current Medications:\n");
         displayMeds();
         printf("\nWould you like to modify this list?(y/n)\n");
@@ -132,15 +129,15 @@ void main()
             }
         }
         break;
-    case 8:
+    case 6:
         printf("\nVer.%.2f \nTimely Prescription Reminders TM: a time based prescription reminder system.\n\nMade by Joseph Ramsay, Saish Gondkar, Krishna Valkambe, and Soham Panchal\n",ver);
         printf("\nCoded entirely AI free\n");
         break;
-    case 9:
+    case 7:
         printf("Displaying Current Profile...\n"); //note: swap case 8/9 at some point
         displayPatient();
         break;
-    case 10:
+    case 8:
         printf("Have a nice day!");
         break;
     default:
@@ -187,8 +184,8 @@ void addMedicine(){
         mptr->schedule[5] = 0; //NOT DONE(kinda, patch job.redo when 14 day schedule gets implemented): make schedule {1,0,0,1,0,0,1}
         break;
     case 4:
-        mptr->schedule[0] = 1;
-        mptr->schedule[6] = 1; //NOT DONE(kinda, patch job.redo when 14 day schedule gets implemented): make schedule {0,1,1,1,1,1,0}
+        mptr->schedule[0] = 0;
+        mptr->schedule[6] = 0; //NOT DONE(kinda, patch job.redo when 14 day schedule gets implemented): make schedule {0,1,1,1,1,1,0}
         break;
     case 5:
         for(int i = 1; i<6; i++){
@@ -211,63 +208,108 @@ void addMedicine(){
     fclose(fptr);
 
     fptr = fopen("schedule.txt","a");
+    fprintf(fptr, "\n");
     for(int k = 0; k<7; k++){
         fprintf(fptr, "%d", mptr->schedule[k]);
-        printf(" Marker: schedule created ");
+
     }
+
+    printf(" Marker: schedule created ");
     fclose(fptr);
 }
 
 void removeMedicine(){
     /*
-    have the user input a number (n) to indicate which medicine to skip, then repeat the function of rewriting
-    the medicine files minus the target line (temp file?). will also need to do the same operation for the schedule text file
-    to keep up same values.
+    First open the medication file and copy all of the medications to an array.have the user input a number (n) to
+    indicate which medicine to skip in the rewrite (i.e. the medication that is 'removed') and then rewrite all of
+    the medications to the same file (minus the skipped one). (dont forget to also modify the schedule text)
     */
-    FILE* fptr1 = NULL, * fptr2 = NULL;
+    FILE *fptr;
+    fptr = fopen("medication.txt","r");
     Medication *mptr, temp;
     mptr = &temp;
-    char str[100];
-    char n;
-    printf("\nRemoving a medication...");
-    printf("\nIt is recommended to be filling out the form with your primary emergency contact at your side");
-    char ch;
+    int i = 0, s = 0;
+    char str[100], str2[100];
+    char *x[100][100];
+    char *y[100][100];
+    char remove;
 
+    printf("\nRemoving a medication...\n");
 
-    //copying the file
-    fopen_s(&fptr1, "medication.txt", "r");
-    if (fptr1 == NULL)
-    {
-    printf(" File does not found or error in opening.!!");
-    exit(1);
+    if (fptr == NULL){
+        printf("\nMedication failed to load line 228");
+        exit(1);
     }
 
-    fopen_s(&fptr2, "medicationcopy.txt", "w");
-    if (fptr2 == NULL)
-    {
-    printf(" File does not found or error in opening.!!");
-    fclose(fptr1);
-    exit(2);
+    while(fgets(str, 100, fptr)!= NULL){
+    strcpy(x[i], str);
+    printf("%s", str);
+    printf("%d. %s",i, *(x+i));
+    i++;
     }
 
-    char str2;
-    str2 = fgetc(fptr1);
-    while (str2 != EOF)
+    fclose(fptr); //first file pointer closed
+
+    fptr = fopen("medication.txt","w");
+    if (fptr == NULL){
+        printf("\nMedication failed to load line 251");
+        exit(1);
+    }
+
+    printf("\nWhich medication would you like to remove?(Please select the corresponding number)");
+    scanf(" %d", &remove);
+
+    for(int j = 0; j < i; j++)
     {
-    ch = fgetc(fptr1);
-    if (ch == EOF)
+        if(j != remove)
+        {
+            fprintf(fptr, "%s", x+j);
+            printf("Med Kept: %s", *(x+j));
+        }
+    }
+
+    fclose(fptr);
+
+    //read and store the schedule in an array y
+    fptr = fopen("schedule.txt","r");
+
+    if (fptr == NULL){
+        printf("\nSchedule failed to load line 277");
+        exit(1);
+    }
+
+    while(fgets(str2, 100, fptr)!= NULL){
+    strcpy(y[s], str2);
+    printf("%s", str2);
+    printf("%d. %s",y, *(y+s));
+    s++;
+    }
+    fclose(fptr);
+
+    //rewrite the schedule
+    fptr = fopen("schedule.txt","w");
+
+    if (fptr == NULL){
+        printf("\nSchedule failed to load line 293");
+        exit(1);
+    }
+    for(int k = 0; k < i-1; k++)
     {
-    break;
+        if(k != remove-1)
+        {
+            fprintf(fptr, "%s", y+k);
+            printf("sched Kept: %s", *(y+k));
+        }
     }
-    else
-    {
-    fputc(ch, fptr2);
+
+
+
+    fclose(fptr);
+
     }
-    }
-    printf(" \nThe file copied successfully in the file. \n\n");
-    fclose(fptr1);
-    fclose(fptr2);
-    }
+
+
+
 
 
 void stateToday(int day){
@@ -530,7 +572,7 @@ void samedayReminders(){
 
     fptr = fopen("schedule.txt","r");
     if (fptr == NULL){
-        printf("\nSchedule failed to load line 531");
+        printf("\nSchedule failed to load line 573");
         exit(0);
     }
     else printf("\nSchedule Loaded...\n");
