@@ -9,6 +9,8 @@ To Do:
 #include <time.h>
 #include <string.h>
 
+#define ver 1.03
+
 //List of functions used
 void firstTime(); //Used for the first time setup
 void inputData();
@@ -21,17 +23,6 @@ void stateToday(int day);
 void stateMonth(int month);
 void addMedicine();
 void removeMedicine();
-
-
-enum Week{
-    Sunday,
-    Monday,
-    Tuesday,
-    Wednesday,
-    Thursday,
-    Friday,
-    Saturday
-};
 
 typedef struct Address{
     char streetName[10];
@@ -88,7 +79,6 @@ void main()
     }
     else printf("Data Loaded...\n");
 
-
     while(decision!= 10)
     {
         printf("\nMain Menu:\n\nWhat would you like to do?\n1.Input Data(First time reset)\n2.Display Reminders\n3.Refill Reminders\n4.Notes\n5.Display Pharmacy Info");
@@ -143,10 +133,11 @@ void main()
         }
         break;
     case 8:
-        printf("\nVer. 1.02\nTimely Prescription Reminders TM: a time based prescription reminder system.\n\nMade by Joseph Ramsay, Saish Gondkar, Krishna Valkambe, and Soham Panchal\n\n");
+        printf("\nVer.%.2f \nTimely Prescription Reminders TM: a time based prescription reminder system.\n\nMade by Joseph Ramsay, Saish Gondkar, Krishna Valkambe, and Soham Panchal\n",ver);
+        printf("\nCoded entirely AI free\n");
         break;
     case 9:
-        printf("Displaying Current Profile...\n"); //swap case 8/9 at some point
+        printf("Displaying Current Profile...\n"); //note: swap case 8/9 at some point
         displayPatient();
         break;
     case 10:
@@ -228,12 +219,56 @@ void addMedicine(){
 }
 
 void removeMedicine(){
+    /*
+    have the user input a number (n) to indicate which medicine to skip, then repeat the function of rewriting
+    the medicine files minus the target line (temp file?). will also need to do the same operation for the schedule text file
+    to keep up same values.
+    */
+    FILE* fptr1 = NULL, * fptr2 = NULL;
+    Medication *mptr, temp;
+    mptr = &temp;
+    char str[100];
+    char n;
+    printf("\nRemoving a medication...");
+    printf("\nIt is recommended to be filling out the form with your primary emergency contact at your side");
+    char ch;
 
 
-    //first thing to do in next update
+    //copying the file
+    fopen_s(&fptr1, "medication.txt", "r");
+    if (fptr1 == NULL)
+    {
+    printf(" File does not found or error in opening.!!");
+    exit(1);
+    }
 
+    fopen_s(&fptr2, "medicationcopy.txt", "w");
+    if (fptr2 == NULL)
+    {
+    printf(" File does not found or error in opening.!!");
+    fclose(fptr1);
+    exit(2);
+    }
 
-}
+    char str2;
+    str2 = fgetc(fptr1);
+    while (str2 != EOF)
+    {
+    ch = fgetc(fptr1);
+    if (ch == EOF)
+    {
+    break;
+    }
+    else
+    {
+    fputc(ch, fptr2);
+    }
+    }
+    printf(" \nThe file copied successfully in the file. \n\n");
+    fclose(fptr1);
+    fclose(fptr2);
+    }
+
 
 void stateToday(int day){
 
@@ -495,7 +530,7 @@ void samedayReminders(){
 
     fptr = fopen("schedule.txt","r");
     if (fptr == NULL){
-        printf("\nSchedule failed to load line 419");
+        printf("\nSchedule failed to load line 531");
         exit(0);
     }
     else printf("\nSchedule Loaded...\n");
@@ -517,7 +552,7 @@ void samedayReminders(){
 
     fptr = fopen("medication.txt","r"); //opens the medications document, to log what is needed to be taken
     if (fptr == NULL){
-        printf("\nPrescription list failed to load line 446");
+        printf("\nPrescription list failed to load line 554");
         exit(0);
     }
     else printf("\nPrescriptions Loaded...\n\n");
