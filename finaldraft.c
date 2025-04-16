@@ -3,7 +3,7 @@
 #include <time.h>
 #include <string.h>
 
-#define ver 1.06
+#define ver 1.07
 
 // List of functions used
 void firstTime(); // Used for the first time setup
@@ -214,10 +214,8 @@ void addMedicine()
     }
 
     printf("\nSchedule is: ");
-    fprintf(fptr, " Schedule is: ");
     for (int j = 0; j < 7; j++)
     {
-        fprintf(fptr, " %d ", mptr->schedule[j]);
         printf("%d, ", mptr->schedule[j]);
     }
     fclose(fptr);
@@ -449,9 +447,9 @@ void inputData()
     }
 
     // section 5: make schedule
-    printf("\nHow often is this medication prescribed?\n1.Everyday\n2.Every other day\n3.Every 3 days\n4.Weekdays\n5.Weekends\n6.Custom...\n");
+    printf("\nHow often is this medication prescribed?\n1.Everyday\n2.Every other day\n3.Every 3 days\n4.Weekdays\n5.Weekends\n");
     scanf(" %d", &choice);
-    switch (choice) // Indented the switch case
+    switch (choice)
     {
     case 1:
         printf("\nSchedule for this medication is compiled");
@@ -467,32 +465,30 @@ void inputData()
         mptr->schedule[1] = 0;
         mptr->schedule[2] = 0;
         mptr->schedule[4] = 0;
-        mptr->schedule[5] = 0; // NOT DONE(kinda, patch job.redo when 14 day schedule gets implemented): make schedule {1,0,0,1,0,0,1}
+        mptr->schedule[5] = 0;
         break;
     case 4:
         mptr->schedule[0] = 1;
-        mptr->schedule[6] = 1; // NOT DONE(kinda, patch job.redo when 14 day schedule gets implemented): make schedule {0,1,1,1,1,1,0}
+        mptr->schedule[6] = 1;
         break;
     case 5:
         for (int i = 1; i < 6; i++)
         {
-            mptr->schedule[i] = 0; // NOT DONE(same as above): make schedule {1,0,0,0,0,0,1}
+            mptr->schedule[i] = 0;
         }
         break;
-    case 6:
+    /*case 6:
         for (int i = 0; i < 7; i++)
         {
-            mptr->schedule[i] = 1; // NOT DONE: make schedule custom
+            mptr->schedule[i] = 1;
         }
-        break;
+        break;*/
     }
 
     // section 5.5: document schedule
     printf("\nSchedule is: ");
-    fprintf(fptr, " Schedule is: ");
-    for (int j = 0; j < 7; j++) // Indented the first bracket
+    for (int j = 0; j < 7; j++)
     {
-        fprintf(fptr, " %d ", mptr->schedule[j]);
         printf("%d, ", mptr->schedule[j]);
     }
     fclose(fptr);
@@ -501,9 +497,9 @@ void inputData()
     for (int k = 0; k < 7; k++) // Indented the first bracket
     {
         fprintf(fptr, "%d", mptr->schedule[k]);
-        printf(" Marker: schedule created ");
     }
     fclose(fptr);
+    printf(" Schedule created Successfully!");
 }
 
 void displayPatient() // Indented the first bracket and the while loop
@@ -595,7 +591,7 @@ void samedayReminders() // Indented the first bracket of the function, the condi
     char str[100];
     int med[10];
 
-    printf("Today is "); // im sure I can clean this up into one print statement at some point
+    printf("Today is ");
     stateToday(local->tm_wday);
     printf(", ");
     stateMonth(local->tm_mon);
@@ -605,7 +601,7 @@ void samedayReminders() // Indented the first bracket of the function, the condi
     fptr = fopen("schedule.txt", "r");
     if (fptr == NULL)
     {
-        printf("\nSchedule failed to load line 573");
+        printf("\nSchedule failed to load line 606");
         exit(0);
     }
     else
@@ -632,7 +628,7 @@ void samedayReminders() // Indented the first bracket of the function, the condi
         exit(0);
     }
     else
-        printf("\nPrescriptions Loaded...\n\n");
+        printf("\n\n");
     int j = 0;
     while (fgets(str, 100, fptr)) // checks value of medicine array, and if its 1/true value, prints the line from the document. //Changed the comment position to immediately after the wihle loop and before the bracket
     {
