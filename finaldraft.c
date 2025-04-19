@@ -3,7 +3,7 @@
 #include <time.h>
 #include <string.h>
 
-#define ver 1.08
+#define ver 1.09
 
 //replace scanf with fgets for pharmacy/physician, then do the same for emergency contact info (full name)
 
@@ -248,9 +248,9 @@ void removeMedicine()
     mptr = &temp;
     int i = 0, s = 0;
     char str[100], str2[100];
-    char *x[100][100];
-    char *y[100][100];
-    char remove;
+    char x[100][100];
+    char y[100][100];
+    int remove;
 
     printf("\nRemoving a medication...\n");
 
@@ -263,7 +263,7 @@ void removeMedicine()
     while (fgets(str, 100, fptr) != NULL)
     {
         strcpy(x[i], str);
-        printf("%d. %s", i, *(x + i));
+        printf("%d. %s", i, x[i]);
         i++;
     }
 
@@ -283,7 +283,7 @@ void removeMedicine()
     {
         if (j != remove)
         {
-            fprintf(fptr, "%s", x + j);
+            fprintf(fptr, "%s", x[j]);
         }
     }
 
@@ -316,7 +316,7 @@ void removeMedicine()
     {
         if (k != remove - 1)
         {
-            fprintf(fptr, "%s", y + k);
+            fprintf(fptr, "%s", y[k]);
         }
     }
     fclose(fptr);
