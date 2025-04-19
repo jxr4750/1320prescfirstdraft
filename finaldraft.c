@@ -3,10 +3,7 @@
 #include <time.h>
 #include <string.h>
 
-#define ver 1.09
-
-//replace scanf with fgets for pharmacy/physician, then do the same for emergency contact info (full name)
-
+#define ver 1.010
 // List of functions used
 void firstTime(); // Used for the first time setup
 void inputData();
@@ -179,7 +176,7 @@ void addMedicine()
     {
         mptr->schedule[i] = 1; // make schedule {1,1,1,1,1,1,1}
     }
-    printf("\nHow often is this medication prescribed?\n1. Everyday\n2. Every other day\n3. Every 3 days\n4. Weekdays\n5. Weekends\n6. Custom...\n");
+    printf("\nHow often is this medication prescribed?\n1. Everyday\n2. Every other day\n3. Every 3 days\n4. Weekdays\n5. Weekends\n");
     scanf(" %d", &choice);
     switch (choice)
     {
@@ -207,12 +204,6 @@ void addMedicine()
         for (int i = 1; i < 6; i++)
         {
             mptr->schedule[i] = 0;
-        }
-        break;
-    case 6:
-        for (int i = 0; i < 7; i++)
-        {
-            mptr->schedule[i] = 1;
         }
         break;
     }
@@ -263,7 +254,8 @@ void removeMedicine()
     while (fgets(str, 100, fptr) != NULL)
     {
         strcpy(x[i], str);
-        printf("%d. %s", i, x[i]);
+        if(i == 0)printf("%s", x[i]);
+        else printf("%d. %s", i, x[i]);
         i++;
     }
 
@@ -415,24 +407,24 @@ void inputData()
     fprintf(fptr, "Patient Name: %s %s %s", temp.firstName, temp.middleName, temp.lastName);
 
     // Section 2: Establish patient DOB
-    printf("Enter Patient DOB (MM/DD/YYYY): ");
+    printf("Enter Patient DOB (MM DD YYYY): ");
     scanf("%d %d %d", &temp.birthMonth, &temp.birthDay, &temp.birthYear);
-    fprintf(fptr, "\nPatient DOB: %d %d %d", temp.birthMonth, temp.birthDay, temp.birthYear);
+    fprintf(fptr, "\nPatient DOB: %d/%d/%d", temp.birthMonth, temp.birthDay, temp.birthYear);
     fclose(fptr);
 
     // Section 3: Emergency contact (primary)
     fptr = fopen("emergencyContact.txt", "w");
     printf("\nPlease enter your primary emergency contact (You may add more or switch them out at any time, for the first time set up we need at least one.");
     printf("It is recommended to be filling out the first time set up with them at your side)");
-    printf("\nPlease input first name:");
+    printf("\nInput first name : ");
     scanf("%s", primary.firstName);
-    printf("Please input last name:");
+    printf("Input last name : ");
     scanf("%s", primary.lastName);
-    printf("Please input relation:");
+    printf("Input relation : ");
     scanf("%s", primary.relation);
-    printf("Please input phone number [format: +1 (XXX) XXX-XXXX]: ");
+    printf("Input phone number [format: XXX XXX XXXX]: ");
     scanf("%d %d %d", &primary.phoneNumber1, &primary.phoneNumber2, &primary.phoneNumber3);
-    fprintf(fptr, "Emergency Contact (primary): %s %s %s (%d) %d-%d", primary.firstName, primary.lastName, primary.relation, primary.phoneNumber1, primary.phoneNumber2, primary.phoneNumber3);
+    fprintf(fptr, "Emergency Contact (primary): %s %s %s +1(%d) %d-%d", primary.firstName, primary.lastName, primary.relation, primary.phoneNumber1, primary.phoneNumber2, primary.phoneNumber3);
     fclose(fptr);
 
     // section 4: Input first Medication
@@ -443,7 +435,7 @@ void inputData()
     scanf("%s", first.name);
     printf("Please input dosage amount followed by the unit (ex: 10 ml, 1 tablet)");
     scanf("%d %s", &first.dosage_amount, first.dosage_unit);
-    fprintf(fptr, "Medications | Dosage Amount | Schedule\n%s  %d / %s ", first.name, first.dosage_amount, first.dosage_unit);
+    fprintf(fptr, "Medications | Dosage Amount\n%s  %d / %s ", first.name, first.dosage_amount, first.dosage_unit);
 
     for (int i = 0; i < 7; i++)
     {
