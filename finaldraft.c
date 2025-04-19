@@ -3,7 +3,9 @@
 #include <time.h>
 #include <string.h>
 
-#define ver 1.07
+#define ver 1.08
+
+//replace scanf with fgets for pharmacy/physician, then do the same for emergency contact info (full name)
 
 // List of functions used
 void firstTime(); // Used for the first time setup
@@ -82,24 +84,26 @@ void main()
     else
         printf("Data Loaded...\n");
 
+    printf("\nTimely Prescription Reminders\n");
+
     while (decision != 8)
     {
         printf("\nMain Menu:\n\nWhat would you like to do?\n1. Input Data(First time reset)\n2. Display Reminders\n3. Display Pharmacy Info");
         printf("\n4. Display Emergency Contacts\n5. List all Current Medications\n6. Display Patient Profile\n7. Contact us(credits)\n8. Exit\n\n");
-        scanf("%d", &decision); // Added a space after every number (1." ")
+        scanf("%d", &decision);
 
-        switch (decision) // Indented the whole switch case
+        switch (decision)
         {
         case 1:
-            printf("Inputing Data...\n"); // Put towards the bottom?
+            printf("Inputing Data...\n");
             inputData();
             break;
         case 2:
-            printf("Displaying Reminders...\n"); // finished and works, just need to trim the fat
+            printf("Displaying Reminders...\n");
             samedayReminders();
             break;
         case 3:
-            printf("Displaying Pharmacy info...");
+            printf("Displaying Pharmacy info...\n");
             displayPharmacy();
             break;
         case 4:
@@ -150,7 +154,7 @@ void main()
         default:
             printf("Command not recognized, please select again");
             break;
-        } // closes the switch case             //Changed from "closes the main menu"
+        } // closes the switch case
 
     } // closes while loop for main menu
 
@@ -177,7 +181,7 @@ void addMedicine()
     }
     printf("\nHow often is this medication prescribed?\n1. Everyday\n2. Every other day\n3. Every 3 days\n4. Weekdays\n5. Weekends\n6. Custom...\n");
     scanf(" %d", &choice);
-    switch (choice) // Indented the switch case
+    switch (choice)
     {
     case 1:
         printf("\nSchedule for this medication is compiled");
@@ -193,22 +197,22 @@ void addMedicine()
         mptr->schedule[1] = 0;
         mptr->schedule[2] = 0;
         mptr->schedule[4] = 0;
-        mptr->schedule[5] = 0; // NOT DONE(kinda, patch job.redo when 14 day schedule gets implemented): make schedule {1,0,0,1,0,0,1}
+        mptr->schedule[5] = 0;
         break;
     case 4:
         mptr->schedule[0] = 0;
-        mptr->schedule[6] = 0; // NOT DONE(kinda, patch job.redo when 14 day schedule gets implemented): make schedule {0,1,1,1,1,1,0}
+        mptr->schedule[6] = 0;
         break;
     case 5:
         for (int i = 1; i < 6; i++)
         {
-            mptr->schedule[i] = 0; // NOT DONE(same as above): make schedule {1,0,0,0,0,0,1}
+            mptr->schedule[i] = 0;
         }
         break;
     case 6:
         for (int i = 0; i < 7; i++)
         {
-            mptr->schedule[i] = 1; // NOT DONE: make schedule custom
+            mptr->schedule[i] = 1;
         }
         break;
     }
@@ -227,11 +231,11 @@ void addMedicine()
         fprintf(fptr, "%d", mptr->schedule[k]);
     }
 
-    printf(" Marker: schedule created ");
+    printf("Prescription Added...\n ");
     fclose(fptr);
 }
 
-void removeMedicine() // Indented the body of loops, if statements and the closing bracket of the function
+void removeMedicine()
 {
     /*
     First open the medication file and copy all of the medications to an array.have the user input a number (n) to
@@ -272,7 +276,7 @@ void removeMedicine() // Indented the body of loops, if statements and the closi
         exit(1);
     }
 
-    printf("\nWhich medication would you like to remove?(Please select the corresponding number)");
+    printf("\nWhich medication would you like to remove?(Please select the corresponding number)\n");
     scanf(" %d", &remove);
 
     for (int j = 0; j < i; j++)
@@ -316,9 +320,10 @@ void removeMedicine() // Indented the body of loops, if statements and the closi
         }
     }
     fclose(fptr);
+    printf("Prescription removed... \n");
 }
 
-void stateToday(int day) // Indented the switch case body
+void stateToday(int day)
 {
     switch (day)
     {
@@ -346,7 +351,7 @@ void stateToday(int day) // Indented the switch case body
     }
 }
 
-void stateMonth(int month) // Indented the switch case body
+void stateMonth(int month)
 {
     switch (month)
     {
@@ -408,7 +413,6 @@ void inputData()
     printf("Enter last name: ");
     scanf("%s", temp.lastName);
     fprintf(fptr, "Patient Name: %s %s %s", temp.firstName, temp.middleName, temp.lastName);
-    // Make sure to update to store in the memory so it is always on hand.
 
     // Section 2: Establish patient DOB
     printf("Enter Patient DOB (MM/DD/YYYY): ");
@@ -441,7 +445,7 @@ void inputData()
     scanf("%d %s", &first.dosage_amount, first.dosage_unit);
     fprintf(fptr, "Medications | Dosage Amount | Schedule\n%s  %d / %s ", first.name, first.dosage_amount, first.dosage_unit);
 
-    for (int i = 0; i < 7; i++) // Indented the first bracket
+    for (int i = 0; i < 7; i++)
     {
         mptr->schedule[i] = 1; // make schedule {1,1,1,1,1,1,1}
     }
@@ -477,12 +481,6 @@ void inputData()
             mptr->schedule[i] = 0;
         }
         break;
-    /*case 6:
-        for (int i = 0; i < 7; i++)
-        {
-            mptr->schedule[i] = 1;
-        }
-        break;*/
     }
 
     // section 5.5: document schedule
@@ -502,7 +500,7 @@ void inputData()
     printf(" Schedule created Successfully!");
 }
 
-void displayPatient() // Indented the first bracket and the while loop
+void displayPatient()
 {
     FILE *fptr;
     char str[100];
@@ -514,7 +512,7 @@ void displayPatient() // Indented the first bracket and the while loop
     fclose(fptr);
 }
 
-void displayMeds() // Indented the first bracket of the method and the while loop
+void displayMeds()
 {
     FILE *fptr;
     char str[100];
@@ -526,7 +524,7 @@ void displayMeds() // Indented the first bracket of the method and the while loo
     fclose(fptr);
 }
 
-void displayContacts() // Indented the first bracke and the while loop
+void displayContacts()
 {
     FILE *fptr;
     char str[100];
@@ -538,25 +536,30 @@ void displayContacts() // Indented the first bracke and the while loop
     fclose(fptr);
 }
 
-void inputPharmacy() // Indented the first bracket
+void inputPharmacy()
 {
-
-    Pharmacy temp;
     FILE *fptr;
     char doctor[20];
+    char hospital[100];
+    char physician[100];
+    getchar();
 
-    fptr = fopen("pharmacyInfo.txt", "w"); // add option to input address?
+    fptr = fopen("pharmacyInfo.txt", "w");
+
     printf("Enter pharmacy name: ");
-    scanf("%s", temp.storeName);
+    fgets(hospital, sizeof(hospital), stdin);
+    fprintf(fptr, "Pharmacy: ");
+    fputs(hospital, fptr);
 
     printf("Enter primary physician's name: ");
-    scanf("%s", doctor);
-    fprintf(fptr, "Pharmacy: %s \nPrimary Physcian:%s", temp.storeName, doctor);
+    fgets(physician, sizeof(physician), stdin);
+    fprintf(fptr, "Primary Physician: ");
+    fputs(physician, fptr);
 
     fclose(fptr);
 }
 
-void displayPharmacy() // Indented the functions first bracket and the if else statements
+void displayPharmacy()
 {
     char choice;
     FILE *fptr;
@@ -582,7 +585,7 @@ void displayPharmacy() // Indented the functions first bracket and the if else s
     }
 }
 
-void samedayReminders() // Indented the first bracket of the function, the conditional statements and the while loop
+void samedayReminders()
 {
     int counter = 0, check = 0; // count how many medications to take today.
     time_t now = time(NULL);
@@ -630,7 +633,7 @@ void samedayReminders() // Indented the first bracket of the function, the condi
     else
         printf("\n\n");
     int j = 0;
-    while (fgets(str, 100, fptr)) // checks value of medicine array, and if its 1/true value, prints the line from the document. //Changed the comment position to immediately after the wihle loop and before the bracket
+    while (fgets(str, 100, fptr)) // checks value of medicine array, and if its 1/true value, prints the line from the document.
     {
         if (med[j] == 1)
         {
@@ -642,7 +645,7 @@ void samedayReminders() // Indented the first bracket of the function, the condi
     printf("\nThere are %d medications scheduled for today.\n", check);
 }
 
-void firstTime() // Indented the functions first bracket, and the conditional statements brackets
+void firstTime()
 {
     printf("\nThank you for choosing Timely Prescription reminders, we are pleased to have your company.");
     FILE *fptr;
