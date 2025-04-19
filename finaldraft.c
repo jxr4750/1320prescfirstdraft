@@ -57,10 +57,10 @@ typedef struct Pharmacy
     Address pharmacyAddress; // Pharmacy Address
 } Pharmacy;
 
-void main()
+int main()
 {
-    int decision;
-    char choice, mod, mod2;
+    int decision, mod2;
+    char choice, mod;
 
     time_t now = time(NULL);
     struct tm *local = localtime(&now); // for time functions
@@ -154,7 +154,7 @@ void main()
         } // closes the switch case
 
     } // closes while loop for main menu
-
+    return 0;
 } // closes main
 
 void addMedicine()
